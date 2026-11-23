@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>變動的大地 · 啟動教學</title>
+<style>
+:root{
+  --sky:#e8f4fc; --water:#4fa8d8; --deep:#1a6b9a; --sand:#f5e6c8;
+  --green:#5a9e6f; --orange:#e8913a; --red:#d94f4f; --purple:#7b6bb0;
+  --ink:#2c3e50; --muted:#6b7c8a; --card:#fff; --ok:#2e9e5b; --bad:#c0392b;
+  --star:#f5c542; --shadow:0 4px 14px rgba(30,60,90,.12);
+  --radius:16px; --tap:48px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;
+  background:linear-gradient(180deg,#dff0fb 0%,#f7f3e8 55%,#efe6d4 100%);
+  color:var(--ink);font-size:18px;line-height:1.55;min-height:100%}
+button{font:inherit;cursor:pointer;border:none;border-radius:12px;
+  min-height:var(--tap);padding:12px 20px;font-weight:700;transition:.15s}
+button:active{transform:scale(.97)}
+.screen{display:none;max-width:980px;margin:0 auto;padding:12px 14px 100px}
+.screen.active{display:block}
+/* Top bar */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);
+  backdrop-filter:blur(8px);border-bottom:1px solid #d5e4ef;
+  padding:8px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.brand{font-weight:800;color:var(--deep);font-size:16px;flex:1}
+.stars{background:#fff7d6;border:2px solid var(--star);border-radius:999px;
+  padding:4px 12px;font-weight:800;color:#8a6a00;font-size:16px}
+.timer-chip{background:#eef6ff;border:2px solid #a8c8e8;border-radius:999px;
+  padding:4px 12px;font-size:15px;color:var(--deep);font-weight:700}
+.progress{display:flex;gap:6px;width:100%;margin-top:4px}
+.progress .seg{flex:1;height:10px;border-radius:6px;background:#d9e6f0;overflow:hidden}
+.progress .seg.fill{background:linear-gradient(90deg,var(--water),var(--green))}
+.progress .seg.current{outline:2px solid var(--orange);outline-offset:1px}
+.nav-dots{display:flex;gap:6px;flex-wrap:wrap;width:100%}
+.nav-dots button{min-height:36px;padding:6px 10px;font-size:14px;background:#edf4fa;color:var(--deep)}
+.nav-dots button.on{background:var(--deep);color:#fff}
+.nav-dots button.done{background:#d4f0df;color:#1a6b3a}
+/* Cards */
+.hero{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:18px;margin:14px 0}
+.hero h1{margin:0 0 8px;font-size:26px;color:var(--deep)}
+.hero h2{margin:0 0 8px;font-size:22px;color:var(--deep)}
+.badge{display:inline-block;background:var(--orange);color:#fff;font-size:14px;
+  padding:3px 10px;border-radius:999px;margin-bottom:8px;font-weight:700}
+.hook{background:#fff8ee;border-left:6px solid var(--orange);padding:12px 14px;
+  border-radius:0 12px 12px 0;margin:12px 0;font-size:19px}
+.task{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);
+  padding:16px;margin:14px 0}
+.task h3{margin:0 0 10px;font-size:20px;display:flex;align-items:center;gap:8px}
+.task-num{background:var(--water);color:#fff;width:32px;height:32px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;font-size:16px}
+.think{background:#f0eef8;border:2px dashed var(--purple);border-radius:var(--radius);
+  padding:14px;margin:14px 0}
+.think h3{margin:0 0 8px;color:var(--purple);font-size:19px}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:700;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:#e5f8ec;color:#1a6b3a;border:2px solid #8fd4a8}
+.feedback.bad{background:#fdecea;color:#922;border:2px solid #f0a8a0}
+.feedback.info{background:#eaf4fc;color:var(--deep);border:2px solid #a8d0ea}
+/* Buttons */
+.btn-primary{background:var(--deep);color:#fff}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-warn{background:var(--orange);color:#fff}
+.btn-ghost{background:#edf4fa;color:var(--deep)}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+/* Vote cards */
+.vote-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.vote-grid{grid-template-columns:1fr}}
+.vote-card{border:3px solid #d5e4ef;border-radius:14px;padding:10px;background:#fafcfe;
+  text-align:center;cursor:pointer;user-select:none;min-height:120px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+.vote-card.selected-yes{border-color:var(--ok);background:#e8f8ee}
+.vote-card.selected-no{border-color:var(--bad);background:#fdecea}
+.vote-card .label{font-weight:800;font-size:16px}
+.vote-card .sub{font-size:14px;color:var(--muted)}
+.vote-btns{display:flex;gap:6px;margin-top:4px}
+.vote-btns button{min-height:40px;padding:6px 12px;font-size:14px;flex:1}
+.vote-btns .y{background:#d4f0df;color:#1a6b3a}
+.vote-btns .n{background:#fde0dc;color:#922}
+/* Sort / drag zones */
+.zones{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+@media(max-width:700px){.zones{grid-template-columns:1fr}}
+.zone{min-height:110px;border:3px dashed #b8cddc;border-radius:14px;padding:8px;
+  background:rgba(255,255,255,.7)}
+.zone h4{margin:0 0 6px;text-align:center;font-size:16px;color:var(--deep)}
+.zone.over{border-color:var(--orange);background:#fff4e6}
+.zone.correct{border-color:var(--ok);border-style:solid;background:#e8f8ee}
+.pool{display:flex;flex-wrap:wrap;gap:8px;min-height:56px;padding:8px;
+  background:#f0f6fb;border-radius:12px;margin-bottom:10px}
+.chip{background:#fff;border:2px solid var(--water);border-radius:12px;padding:10px 14px;
+  font-weight:700;font-size:16px;cursor:grab;touch-action:none;user-select:none;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);display:inline-flex;align-items:center;gap:6px}
+.chip.dragging{opacity:.5;transform:scale(1.05)}
+.chip.placed{cursor:pointer}
+.chip.wrong{border-color:var(--bad);background:#fdecea}
+.chip.right{border-color:var(--ok);background:#e8f8ee}
+/* Meander tap */
+.meander-wrap{position:relative;max-width:520px;margin:0 auto}
+.meander-wrap svg{width:100%;height:auto;display:block}
+.tap-hot{cursor:pointer}
+.tap-hot:hover{opacity:.9}
+.choice-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+.choice-row button{flex:1;min-width:120px;font-size:17px}
+.choice-row button.picked{outline:3px solid var(--orange)}
+.choice-row button.right{background:var(--ok);color:#fff}
+.choice-row button.wrong{background:var(--bad);color:#fff}
+/* Match grid */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.match-grid{grid-template-columns:1fr}}
+.match-item{border:3px solid #d5e4ef;border-radius:14px;padding:12px;background:#fff;
+  text-align:center}
+.match-item select,.match-item .opt-btns{width:100%;margin-top:8px}
+.opt-btns{display:flex;flex-direction:column;gap:6px}
+.opt-btns button{font-size:15px;min-height:42px;background:#edf4fa;color:var(--deep);font-weight:600}
+.opt-btns button.right{background:var(--ok);color:#fff}
+.opt-btns button.wrong{background:var(--bad);color:#fff;opacity:.7}
+/* Mineral cards */
+.mineral-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.mineral-card{border:3px solid #d5e4ef;border-radius:14px;padding:12px;text-align:center;
+  background:#fff;cursor:pointer;min-height:100px}
+.mineral-card.flipped{border-color:var(--purple);background:#f5f2fc}
+.mineral-card .ico{font-size:36px;line-height:1}
+.mineral-card .name{font-weight:800;margin-top:4px}
+.quiz-q{font-size:18px;font-weight:700;margin:8px 0}
+/* Teacher panel */
+.teacher-toggle{position:fixed;bottom:16px;right:16px;z-index:80;
+  background:var(--purple);color:#fff;border-radius:999px;padding:12px 18px;
+  box-shadow:0 6px 18px rgba(80,60,120,.3);font-size:15px}
+.teacher-panel{display:none;position:fixed;bottom:70px;right:12px;left:12px;
+  max-width:520px;margin-left:auto;z-index:79;background:#2c2340;color:#f0eaf8;
+  border-radius:16px;padding:14px 16px;max-height:45vh;overflow:auto;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:15px}
+.teacher-panel.open{display:block}
+.teacher-panel h4{margin:0 0 8px;color:#d4b8ff}
+.teacher-panel ul{margin:0;padding-left:18px}
+.teacher-panel li{margin:4px 0}
+/* Bottom next */
+.footer-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.95);
+  border-top:1px solid #d5e4ef;padding:10px 14px;display:flex;gap:10px;
+  justify-content:space-between;z-index:40}
+.footer-nav button{flex:1;max-width:220px}
+/* SVG helpers */
+.svg-box{background:#f5faff;border-radius:12px;padding:8px;margin:8px 0;overflow:hidden}
+.hint{font-size:15px;color:var(--muted);margin:6px 0}
+.score-pop{animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.hidden{display:none!important}
+.camp-scene{width:100%;max-width:640px;margin:0 auto;display:block}
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brand">🏕 變動的大地 · 啟動教學</div>
+  <div class="timer-chip" id="timerChip" title="教師建議時間">⏱ 0–40 分</div>
+  <div class="stars" id="starBox">⭐ 0</div>
+  <div class="progress" id="progress">
+    <div class="seg current" data-i="0"></div>
+    <div class="seg" data-i="1"></div>
+    <div class="seg" data-i="2"></div>
+    <div class="seg" data-i="3"></div>
+  </div>
+  <div class="nav-dots" id="navDots">
+    <button type="button" data-go="0" class="on">開場</button>
+    <button type="button" data-go="1">活動1 流水</button>
+    <button type="button" data-go="2">活動2 水岸</button>
+    <button type="button" data-go="3">活動3 地表</button>
+  </div>
+</div>
+
+<!-- ========== SCREEN 0 INTRO ========== -->
+<section class="screen active" id="s0" data-timer="0–3 分 · 開場">
+  <div class="hero">
+    <span class="badge">第三單元 · 南一 · 六年級</span>
+    <h1>變動的大地</h1>
+    <p>颱風剛過，班級要去溪邊露營、再到海邊走走。大地好像「動過」一樣——誰造成的？我們用平板一起猜一猜！</p>
+    <svg class="camp-scene" viewBox="0 0 640 220" aria-hidden="true">
+      <defs>
+        <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#a8d8f0"/><stop offset="100%" stop-color="#e8f4fc"/></linearGradient>
+      </defs>
+      <rect width="640" height="220" fill="url(#skyG)"/>
+      <!-- mountains -->
+      <path d="M0 140 L80 60 L140 120 L200 40 L280 130 L360 70 L440 125 L520 50 L640 130 L640 220 L0 220Z" fill="#6a9e7a"/>
+      <path d="M0 160 L100 90 L160 140 L240 80 L320 150 L400 95 L500 145 L580 85 L640 150 L640 220 L0 220Z" fill="#5a8a6a"/>
+      <!-- river -->
+      <path d="M210 40 Q230 100 250 140 Q280 180 360 200 Q450 215 640 210" fill="none" stroke="#4fa8d8" stroke-width="18" stroke-linecap="round"/>
+      <path d="M210 40 Q230 100 250 140 Q280 180 360 200 Q450 215 640 210" fill="none" stroke="#7ec8e8" stroke-width="8" stroke-linecap="round"/>
+      <!-- tent -->
+      <polygon points="420,175 460,120 500,175" fill="#e8913a"/>
+      <line x1="460" y1="120" x2="460" y2="175" stroke="#8a4a10" stroke-width="3"/>
+      <!-- trees -->
+      <circle cx="80" cy="150" r="22" fill="#3d7a4a"/><rect x="75" y="165" width="10" height="20" fill="#5a3a20"/>
+      <circle cx="130" cy="160" r="18" fill="#4a8a5a"/><rect x="126" y="172" width="8" height="16" fill="#5a3a20"/>
+      <!-- sun -->
+      <circle cx="560" cy="45" r="22" fill="#f5c542"/>
+      <text x="20" y="30" fill="#1a6b9a" font-size="16" font-weight="700">颱風後 · 溪邊露營</text>
+    </svg>
+  </div>
+  <div class="task">
+    <h3><span class="task-num">?</span> 先猜一猜</h3>
+    <p>颱風帶來很多雨水後，溪流常會夾帶泥沙和石頭。你覺得大地的改變，跟下面哪幾種力量有關？<span class="hint">（可多選）</span></p>
+    <div class="vote-grid" id="introVote">
+      <div class="vote-card" data-k="water"><div class="ico" style="font-size:32px">💧</div><div class="label">流水</div></div>
+      <div class="vote-card" data-k="wind"><div class="ico" style="font-size:32px">💨</div><div class="label">風</div></div>
+      <div class="vote-card" data-k="wave"><div class="ico" style="font-size:32px">🌊</div><div class="label">海浪</div></div>
+      <div class="vote-card" data-k="bio"><div class="ico" style="font-size:32px">🌱</div><div class="label">生物活動</div></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn-primary" id="introCheck">看結果</button>
+    </div>
+    <div class="feedback info" id="introFb"></div>
+  </div>
+  <div class="hero">
+    <h2>今天三站啟動</h2>
+    <p>① 流水的作用　② 水岸地貌　③ 地表組成<br>每站先猜、再玩、最後「想一想」——準備好出發！</p>
+    <button type="button" class="btn-ok" data-go="1" style="width:100%;margin-top:8px">開始活動 1 ▶</button>
+  </div>
+</section>
+
+<!-- ========== SCREEN 1 活動1 ========== -->
+<section class="screen" id="s1" data-timer="3–15 分 · 活動1">
+  <div class="hero">
+    <span class="badge">活動 1 · 約 12 分</span>
+    <h2>流水的作用</h2>
+    <div class="hook">🏕️ 颱風過後，你們到溪邊露營。河水變黃、路邊有石頭，河床還有一個個小圓洞……這些改變，是流水造成的嗎？</div>
+  </div>
+
+  <div class="task" id="a1t1">
+    <h3><span class="task-num">1</span> 先猜：哪幾張是流水造成的？</h3>
+    <p class="hint">每張選「是」或「不是」，再按檢查。</p>
+    <div class="vote-grid" id="a1votes">
+      <div class="vote-card" data-ans="yes" data-id="v1">
+        <svg viewBox="0 0 160 70" width="100%"><rect width="160" height="70" fill="#c4a574"/>
+          <path d="M20 10 Q40 40 30 70 L0 70 L0 10Z" fill="#8a6a40"/>
+          <circle cx="70" cy="40" r="8" fill="#6a5a40"/><circle cx="95" cy="50" r="6" fill="#5a4a30"/>
+          <rect x="110" y="20" width="40" height="25" fill="#888"/><text x="8" y="64" font-size="11" fill="#fff">土石流蓋住山路</text></svg>
+        <div class="label">土石流覆蓋山路</div>
+        <div class="vote-btns"><button type="button" class="y" data-v="yes">是流水</button><button type="button" class="n" data-v="no">不是</button></div>
+      </div>
+      <div class="vote-card" data-ans="yes" data-id="v2">
+        <svg viewBox="0 0 160 70" width="100%"><rect width="160" height="70" fill="#7ec8e8"/>
+          <rect x="90" y="15" width="50" height="40" fill="#c0392b" transform="rotate(12 115 35)"/>
+          <path d="M0 55 Q40 45 80 55 Q110 60 160 50 L160 70 L0 70Z" fill="#5a8a4a"/>
+          <text x="8" y="64" font-size="11" fill="#1a3a20">溪邊房子地基被掏空</text></svg>
+        <div class="label">地基土石被掏空</div>
+        <div class="vote-btns"><button type="button" class="y" data-v="yes">是流水</button><button type="button" class="n" data-v="no">不是</button></div>
+      </div>
+      <div class="vote-card" data-ans="yes" data-id="v3">
+        <svg viewBox="0 0 160 70" width="100%"><rect width="160" height="70" fill="#6a8aaa"/>
+          <ellipse cx="50" cy="40" rx="18" ry="12" fill="#3a5a70"/><ellipse cx="95" cy="35" rx="12" ry="9" fill="#3a5a70"/>
+          <ellipse cx="120" cy="48" rx="8" ry="6" fill="#2a4a60"/>
+          <text x="8" y="64" font-size="11" fill="#fff">河床上的壺穴</text></svg>
+        <div class="label">壺穴（小圓洞）</div>
+        <div class="vote-btns"><button type="button" class="y" data-v="yes">是流水</button><button type="button" class="n" data-v="no">不是</button></div>
+      </div>
+      <div class="vote-card" data-ans="yes" data-id="v4">
+        <svg viewBox="0 0 160 70" width="100%"><rect width="160" height="70" fill="#a8d0e8"/>
+          <path d="M40 10 L50 10 L55 35 L70 35 L40 70 L30 70 L45 40 L30 40Z" fill="#4fa8d8"/>
+          <rect x="100" y="40" width="50" height="30" fill="#6a7a5a"/>
+          <text x="8" y="64" font-size="11" fill="#1a4a60">簾幕式瀑布</text></svg>
+        <div class="label">瀑布地景</div>
+        <div class="vote-btns"><button type="button" class="y" data-v="yes">是流水</button><button type="button" class="n" data-v="no">不是</button></div>
+      </div>
+    </div>
+    <div class="btn-row"><button type="button" class="btn-primary" id="a1Check1">檢查答案</button></div>
+    <div class="feedback" id="a1Fb1"></div>
+  </div>
+
+  <div class="task" id="a1t2">
+    <h3><span class="task-num">2</span> 分類：侵蝕 · 搬運 · 堆積</h3>
+    <p>把卡片拖進正確的框（也可點選卡片再點框）。</p>
+    <div class="pool" id="a1Pool">
+      <div class="chip" draggable="true" data-cat="erode">沖刷岩石變碎</div>
+      <div class="chip" draggable="true" data-cat="carry">把泥沙往下游帶</div>
+      <div class="chip" draggable="true" data-cat="deposit">流速變慢，砂石沉下來</div>
+      <div class="chip" draggable="true" data-cat="erode">陡坡土石被沖走變少</div>
+      <div class="chip" draggable="true" data-cat="deposit">河口出現沙洲</div>
+      <div class="chip" draggable="true" data-cat="carry">小石頭隨水移動</div>
+    </div>
+    <div class="zones" id="a1Zones">
+      <div class="zone" data-cat="erode"><h4>⛏ 侵蝕</h4></div>
+      <div class="zone" data-cat="carry"><h4>🚚 搬運</h4></div>
+      <div class="zone" data-cat="deposit"><h4>🏖 堆積</h4></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn-primary" id="a1Check2">檢查分類</button>
+      <button type="button" class="btn-ghost" id="a1Reset2">重來</button>
+    </div>
+    <div class="feedback" id="a1Fb2"></div>
+  </div>
+
+  <div class="think">
+    <h3>💭 想一想（帶入課堂）</h3>
+    <p>為什麼山區比平地更容易發生土石崩落？坡度不同，流水作用會一樣嗎？</p>
+    <p class="hint">寫在習作或跟小組說一說，接著老師帶實驗：模擬不同坡度小土堆。</p>
+    <textarea id="a1Think" rows="3" placeholder="我的想法……" style="width:100%;font:inherit;padding:10px;border-radius:10px;border:2px solid #c8b8e0;resize:vertical"></textarea>
+  </div>
+</section>
+
+<!-- ========== SCREEN 2 活動2 ========== -->
+<section class="screen" id="s2" data-timer="15–27 分 · 活動2">
+  <div class="hero">
+    <span class="badge">活動 2 · 約 12 分</span>
+    <h2>水岸地貌</h2>
+    <div class="hook">🥾 從山上走到海邊：上游狹窄湍急、中游開始彎曲、下游寬廣緩慢。河道彎彎的地方，哪一岸會被「吃」掉？</div>
+    <div class="svg-box">
+      <svg viewBox="0 0 640 160" width="100%" aria-label="河流從上游到下游">
+        <rect width="640" height="160" fill="#eaf4fc"/>
+        <!-- mountain left -->
+        <path d="M0 100 L60 30 L120 100Z" fill="#6a9e7a"/>
+        <path d="M80 100 L140 45 L200 100Z" fill="#5a8a6a"/>
+        <!-- river path -->
+        <path d="M100 70 Q160 90 220 75 Q300 55 360 90 Q420 130 500 100 Q560 80 640 95" fill="none" stroke="#4fa8d8" stroke-width="16" stroke-linecap="round"/>
+        <path d="M100 70 Q160 90 220 75 Q300 55 360 90 Q420 130 500 100 Q560 80 640 95" fill="none" stroke="#9ed4f0" stroke-width="6"/>
+        <!-- labels -->
+        <text x="90" y="130" font-size="15" font-weight="700" fill="#1a6b9a">上游</text>
+        <text x="300" y="145" font-size="15" font-weight="700" fill="#1a6b9a">中游</text>
+        <text x="540" y="130" font-size="15" font-weight="700" fill="#1a6b9a">下游 · 海</text>
+        <circle cx="620" cy="95" r="28" fill="#7ec8e8" opacity=".6"/>
+        <!-- stones -->
+        <circle cx="120" cy="85" r="7" fill="#6a5a40"/><circle cx="135" cy="78" r="5" fill="#5a4a30"/>
+        <ellipse cx="340" cy="100" rx="8" ry="5" fill="#8a7a60"/>
+        <ellipse cx="520" cy="108" rx="14" ry="4" fill="#c4b090"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="task" id="a2t1">
+    <h3><span class="task-num">1</span> 拖一拖：景觀放在上游／中游／下游</h3>
+    <div class="pool" id="a2Pool">
+      <div class="chip" draggable="true" data-cat="up">V 字谷</div>
+      <div class="chip" draggable="true" data-cat="up">瀑布、大石頭</div>
+      <div class="chip" draggable="true" data-cat="mid">曲流（河道彎曲）</div>
+      <div class="chip" draggable="true" data-cat="mid">河邊鵝卵石</div>
+      <div class="chip" draggable="true" data-cat="down">三角洲、泥沙淤積</div>
+      <div class="chip" draggable="true" data-cat="down">河面寬廣、水流慢</div>
+    </div>
+    <div class="zones" id="a2Zones">
+      <div class="zone" data-cat="up"><h4>⛰ 上游<br><span style="font-weight:500;font-size:13px">地勢陡、水流急</span></h4></div>
+      <div class="zone" data-cat="mid"><h4>〰 中游<br><span style="font-weight:500;font-size:13px">開始彎曲</span></h4></div>
+      <div class="zone" data-cat="down"><h4>🏝 下游<br><span style="font-weight:500;font-size:13px">平緩寬廣</span></h4></div>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn-primary" id="a2Check1">檢查</button>
+      <button type="button" class="btn-ghost" id="a2Reset1">重來</button>
+    </div>
+    <div class="feedback" id="a2Fb1"></div>
+  </div>
+
+  <div class="task" id="a2t2">
+    <h3><span class="task-num">2</span> 點一點：哪裡是凹岸？哪裡是凸岸？</h3>
+    <p class="hint">先選要標的名稱，再點圖上的河岸。</p>
+    <div class="choice-row" id="a2Mode">
+      <button type="button" class="btn-ghost picked" data-mode="凹岸">標「凹岸」</button>
+      <button type="button" class="btn-ghost" data-mode="凸岸">標「凸岸」</button>
+    </div>
+    <div class="meander-wrap svg-box">
+      <svg id="meanderSvg" viewBox="0 0 400 260" width="100%">
+        <rect width="400" height="260" fill="#eef6e8"/>
+        <!-- land -->
+        <rect width="400" height="260" fill="#d8e8c8"/>
+        <!-- meander river S-curve -->
+        <path d="M0 80 C80 80 80 40 140 40 C200 40 200 120 260 120 C320 120 320 200 400 200"
+              fill="none" stroke="#4fa8d8" stroke-width="36" stroke-linecap="round" id="riverPath"/>
+        <path d="M0 80 C80 80 80 40 140 40 C200 40 200 120 260 120 C320 120 320 200 400 200"
+              fill="none" stroke="#9ed4f0" stroke-width="14"/>
+        <!-- flow arrow -->
+        <polygon points="370,190 390,200 370,210" fill="#1a6b9a"/>
+        <text x="300" y="240" font-size="14" fill="#1a6b9a" font-weight="700">水流方向 →</text>
+        <!-- hotspots: 凹岸 = outer bend (erosion), 凸岸 = inner bend (deposition) -->
+        <!-- first bend: top is 凹岸 (outer/north), bottom inner is 凸岸 -->
+        <circle class="tap-hot" data-bank="凹岸" cx="140" cy="22" r="22" fill="#e8913a" opacity="0.85" stroke="#fff" stroke-width="2"/>
+        <text x="140" y="27" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" pointer-events="none">A</text>
+        <circle class="tap-hot" data-bank="凸岸" cx="140" cy="68" r="22" fill="#7b6bb0" opacity="0.85" stroke="#fff" stroke-width="2"/>
+        <text x="140" y="73" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" pointer-events="none">B</text>
+        <!-- second bend: bottom outer 凹岸, top inner 凸岸 -->
+        <circle class="tap-hot" data-bank="凹岸" cx="260" cy="148" r="22" fill="#e8913a" opacity="0.85" stroke="#fff" stroke-width="2"/>
+        <text x="260" y="153" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" pointer-events="none">C</text>
+        <circle class="tap-hot" data-bank="凸岸" cx="260" cy="95" r="22" fill="#7b6bb0" opacity="0.85" stroke="#fff" stroke-width="2"/>
+        <text x="260" y="100" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" pointer-events="none">D</text>
+      </svg>
+    </div>
+    <p id="a2TapStatus" class="hint">已標：凹岸 0／2　凸岸 0／2</p>
+    <div class="btn-row"><button type="button" class="btn-primary" id="a2Check2">檢查河岸</button>
+      <button type="button" class="btn-ghost" id="a2Reset2">重來</button></div>
+    <div class="feedback" id="a2Fb2"></div>
+    <p class="hint" style="margin-top:12px">進階：海岸也有侵蝕與堆積喔！</p>
+    <div class="match-grid" id="a2Coast">
+      <div class="match-item" data-ans="海蝕崖">
+        <svg viewBox="0 0 120 50" width="100%"><rect width="120" height="50" fill="#7ec8e8"/>
+          <path d="M0 50 L0 20 L40 20 L40 50Z" fill="#8a7a60"/><path d="M40 20 L70 35 L70 50 L40 50Z" fill="#6a5a40"/>
+          <text x="75" y="28" font-size="10" fill="#1a4a60">陡峭岩壁</text></svg>
+        <div class="opt-btns">
+          <button type="button" data-v="海蝕崖">海蝕崖</button>
+          <button type="button" data-v="沙灘">沙灘</button>
+          <button type="button" data-v="海蝕拱門">海蝕拱門</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="海蝕平臺">
+        <svg viewBox="0 0 120 50" width="100%"><rect width="120" height="50" fill="#7ec8e8"/>
+          <path d="M0 50 L0 15 L30 15 L30 35 L120 35 L120 50Z" fill="#9a8a70"/>
+          <text x="40" y="28" font-size="10" fill="#fff">接近海平面的平臺</text></svg>
+        <div class="opt-btns">
+          <button type="button" data-v="海蝕溝">海蝕溝</button>
+          <button type="button" data-v="海蝕平臺">海蝕平臺</button>
+          <button type="button" data-v="沙洲">沙洲</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="海蝕拱門">
+        <svg viewBox="0 0 120 50" width="100%"><rect width="120" height="50" fill="#7ec8e8"/>
+          <path d="M20 50 L20 15 L100 15 L100 50 L75 50 L75 30 Q60 18 45 30 L45 50Z" fill="#7a6a50"/>
+          <text x="48" y="12" font-size="9" fill="#1a4a60">中間被掏空</text></svg>
+        <div class="opt-btns">
+          <button type="button" data-v="牛軛湖">牛軛湖</button>
+          <button type="button" data-v="海蝕拱門">海蝕拱門</button>
+          <button type="button" data-v="礫石灘">礫石灘</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="沙灘">
+        <svg viewBox="0 0 120 50" width="100%"><rect width="120" height="50" fill="#7ec8e8"/>
+          <ellipse cx="60" cy="40" rx="55" ry="12" fill="#f5e6c8"/>
+          <text x="40" y="22" font-size="10" fill="#1a4a60">細沙堆積</text></svg>
+        <div class="opt-btns">
+          <button type="button" data-v="海蝕崖">海蝕崖</button>
+          <button type="button" data-v="沙灘">沙灘</button>
+          <button type="button" data-v="海蝕溝">海蝕溝</button>
+        </div>
+      </div>
+    </div>
+    <div class="feedback" id="a2Fb3"></div>
+  </div>
+
+  <div class="think">
+    <h3>💭 想一想（帶入課堂）</h3>
+    <p>凹岸水流較急、侵蝕強，河岸會後退；凸岸水流較緩、堆積強。曲流頸被切穿後，可能留下什麼湖？</p>
+    <p class="hint">提示：形狀像牛的軛……接著打開課本看曲流與海岸圖。</p>
+    <textarea id="a2Think" rows="3" placeholder="我的想法……" style="width:100%;font:inherit;padding:10px;border-radius:10px;border:2px solid #c8b8e0;resize:vertical"></textarea>
+  </div>
+</section>
+
+<!-- ========== SCREEN 3 活動3 ========== -->
+<section class="screen" id="s3" data-timer="27–39 分 · 活動3">
+  <div class="hero">
+    <span class="badge">活動 3 · 約 12 分</span>
+    <h2>地表組成</h2>
+    <div class="hook">🪨 露營時撿到好多石頭：有的一顆裡有好几种顏色，有的摸起來滑滑的。石頭（岩石）到底是什麼組成的？</div>
+  </div>
+
+  <div class="task" id="a3t1">
+    <h3><span class="task-num">1</span> 岩石三大類：對對看</h3>
+    <p class="hint">依「怎麼形成的」來分類（南一用語）。</p>
+    <div class="match-grid" id="a3Rocks">
+      <div class="match-item" data-ans="火成岩">
+        <div class="label" style="font-weight:800">岩漿冷卻凝固</div>
+        <div class="sub" style="font-size:14px;color:#6b7c8a">例如：花崗岩、玄武岩、安山岩</div>
+        <div class="opt-btns">
+          <button type="button" data-v="火成岩">火成岩</button>
+          <button type="button" data-v="沉積岩">沉積岩</button>
+          <button type="button" data-v="變質岩">變質岩</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="沉積岩">
+        <div class="label" style="font-weight:800">碎屑沉積、壓密形成</div>
+        <div class="sub" style="font-size:14px;color:#6b7c8a">例如：石灰岩、頁岩、砂岩</div>
+        <div class="opt-btns">
+          <button type="button" data-v="火成岩">火成岩</button>
+          <button type="button" data-v="沉積岩">沉積岩</button>
+          <button type="button" data-v="變質岩">變質岩</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="變質岩">
+        <div class="label" style="font-weight:800">高溫高壓改變結構</div>
+        <div class="sub" style="font-size:14px;color:#6b7c8a">例如：大理岩、板岩、片麻岩</div>
+        <div class="opt-btns">
+          <button type="button" data-v="火成岩">火成岩</button>
+          <button type="button" data-v="沉積岩">沉積岩</button>
+          <button type="button" data-v="變質岩">變質岩</button>
+        </div>
+      </div>
+      <div class="match-item" data-ans="岩石">
+        <div class="label" style="font-weight:800">「礦物的集合體」指的是？</div>
+        <div class="sub" style="font-size:14px;color:#6b7c8a">一種或一種以上礦物組成</div>
+        <div class="opt-btns">
+          <button type="button" data-v="土壤">土壤</button>
+          <button type="button" data-v="岩石">岩石</button>
+          <button type="button" data-v="化石">化石</button>
+        </div>
+      </div>
+    </div>
+    <div class="feedback" id="a3Fb1"></div>
+  </div>
+
+  <div class="task" id="a3t2">
+    <h3><span class="task-num">2</span> 礦物偵探：看特徵猜礦物</h3>
+    <p>點選最符合描述的礦物。（顏色、觸感、硬度——南一提過的觀察方式）</p>
+    <div id="mineralQuiz">
+      <div class="quiz-q" id="mqQ">題目載入中…</div>
+      <div class="mineral-grid" id="mqOpts"></div>
+      <div class="feedback" id="a3Fb2"></div>
+      <div class="btn-row"><button type="button" class="btn-ghost" id="mqNext">下一題</button></div>
+    </div>
+    <div class="svg-box" style="margin-top:12px">
+      <svg viewBox="0 0 400 80" width="100%" aria-label="莫氏硬度示意">
+        <text x="10" y="20" font-size="14" font-weight="700" fill="#1a6b9a">莫氏硬度（愈右愈硬）</text>
+        <rect x="10" y="35" width="380" height="28" rx="8" fill="#e8f0f8"/>
+        <rect x="10" y="35" width="38" height="28" rx="8" fill="#c4d4e0"/><text x="18" y="54" font-size="11">滑石1</text>
+        <rect x="90" y="35" width="50" height="28" fill="#a8c8e0"/><text x="98" y="54" font-size="11">方解石3</text>
+        <rect x="200" y="35" width="50" height="28" fill="#7eb0d8"/><text x="212" y="54" font-size="11">石英7</text>
+        <rect x="340" y="35" width="50" height="28" rx="8" fill="#1a6b9a"/><text x="348" y="54" font-size="11" fill="#fff">金剛石</text>
+        <text x="10" y="78" font-size="12" fill="#6b7c8a">硬度大的可在硬度小的表面刻出痕跡</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="think">
+    <h3>💭 想一想（帶入課堂）</h3>
+    <p>花崗岩裡看得到石英、長石、雲母……所以岩石是礦物的集合體。生活中鉛筆筆心、水泥、石板屋，各用到哪些岩石或礦物？</p>
+    <p class="hint">接著做觀察與硬度刻劃實驗，並查用途。</p>
+    <textarea id="a3Think" rows="3" placeholder="我的想法……" style="width:100%;font:inherit;padding:10px;border-radius:10px;border:2px solid #c8b8e0;resize:vertical"></textarea>
+  </div>
+
+  <div class="hero" id="finale">
+    <h2>🎉 啟動完成</h2>
+    <p>你完成了三站啟動！星星：<strong id="finalStars">0</strong></p>
+    <p class="hint">大地一直在變——流水、海浪、風化和生物都在「雕刻」地表。接下來跟著課本活動，動手實驗、仔細觀察！</p>
+    <div class="btn-row">
+      <button type="button" class="btn-warn" id="resetAll">清除紀錄重玩</button>
+      <button type="button" class="btn-ghost" data-go="0">回開場</button>
+    </div>
+  </div>
+</section>
+
+<div class="footer-nav">
+  <button type="button" class="btn-ghost" id="btnPrev">◀ 上一站</button>
+  <button type="button" class="btn-ok" id="btnNext">下一站 ▶</button>
+</div>
+
+<button type="button" class="teacher-toggle" id="teacherBtn">教師提示</button>
+<aside class="teacher-panel" id="teacherPanel" aria-live="polite">
+  <h4>教師提示</h4>
+  <div id="teacherBody"></div>
+</aside>
+
+<script>
+(function(){
+  const SCREENS = ['s0','s1','s2','s3'];
+  const TIMER = [
+    '0–3 分 · 開場',
+    '3–15 分 · 活動1 流水',
+    '15–27 分 · 活動2 水岸',
+    '27–39 分 · 活動3 地表（留 1 分收束）'
+  ];
+  const TEACHER = [
+    '<ul><li>開場用露營情境引起動機，約 3 分。</li><li>四個選項（流水、風、海浪、生物）課本 P.71 都有提到，全對可加星。</li><li>強調「先猜再學」，不要急著講答案。</li></ul>',
+    '<ul><li>任務1：P.70 四張（土石流、掏空、壺穴、瀑布）皆與流水有關，全是「是」。</li><li>任務2：侵蝕／搬運／堆積定義見 P.72 小知識。</li><li>想一想銜接坡度實驗（P.73–75）：陡坡侵蝕較強。</li><li>預期：山區坡度大，土石流失快。</li></ul>',
+    '<ul><li>上中下游：P.76–78；曲流凹岸侵蝕、凸岸堆積：P.79；牛軛湖：P.79。</li><li>圖上 A、C＝凹岸（外側），B、D＝凸岸（內側）。</li><li>海岸：海蝕崖／平臺／溝／拱門為海蝕；沙灘等為海積（P.80–81）。</li><li>想一想答案：牛軛湖。</li></ul>',
+    '<ul><li>岩石三大類 P.85；岩石＝礦物集合體 P.86。</li><li>礦物觀察：顏色、氣味、觸感、硬度（莫氏硬度 P.88）。</li><li>用途：石墨→筆心、石英→飾品、板岩→石板屋、石灰岩→水泥、花崗岩→建材、硫磺→火藥（P.90–91）。</li><li>可提風化與土壤、化石為延伸（P.92–95），啟動以岩石礦物為主即可。</li></ul>'
+  ];
+
+  let idx = 0;
+  let stars = Number(localStorage.getItem('earth_stars') || 0);
+  const awarded = JSON.parse(localStorage.getItem('earth_awarded') || '{}');
+
+  const starBox = document.getElementById('starBox');
+  const timerChip = document.getElementById('timerChip');
+  const teacherBody = document.getElementById('teacherBody');
+
+  function save(){
+    localStorage.setItem('earth_stars', String(stars));
+    localStorage.setItem('earth_awarded', JSON.stringify(awarded));
+    starBox.textContent = '⭐ ' + stars;
+    const fs = document.getElementById('finalStars');
+    if (fs) fs.textContent = stars;
+  }
+  function award(key, n){
+    if (awarded[key]) return;
+    awarded[key] = true;
+    stars += n;
+    starBox.classList.remove('score-pop');
+    void starBox.offsetWidth;
+    starBox.classList.add('score-pop');
+    save();
+  }
+  save();
+
+  function show(i){
+    idx = Math.max(0, Math.min(SCREENS.length-1, i));
+    SCREENS.forEach((id,j)=>{
+      document.getElementById(id).classList.toggle('active', j===idx);
+    });
+    document.querySelectorAll('#navDots button').forEach((b,j)=>{
+      b.classList.toggle('on', j===idx);
+      b.classList.toggle('done', j < idx);
+    });
+    document.querySelectorAll('#progress .seg').forEach((s,j)=>{
+      s.classList.toggle('fill', j < idx);
+      s.classList.toggle('current', j === idx);
+      if (j < idx) s.classList.add('fill');
+    });
+    timerChip.textContent = '⏱ ' + TIMER[idx];
+    teacherBody.innerHTML = TEACHER[idx];
+    document.getElementById('btnPrev').disabled = idx===0;
+    document.getElementById('btnNext').textContent = idx===SCREENS.length-1 ? '完成 ✓' : '下一站 ▶';
+    window.scrollTo(0,0);
+  }
+
+  document.getElementById('btnPrev').onclick = ()=> show(idx-1);
+  document.getElementById('btnNext').onclick = ()=> { if(idx<SCREENS.length-1) show(idx+1); };
+  document.querySelectorAll('[data-go]').forEach(el=>{
+    el.addEventListener('click', ()=> show(Number(el.getAttribute('data-go'))));
+  });
+
+  document.getElementById('teacherBtn').onclick = ()=>{
+    document.getElementById('teacherPanel').classList.toggle('open');
+  };
+
+  /* Intro vote */
+  const introSel = new Set();
+  document.querySelectorAll('#introVote .vote-card').forEach(card=>{
+    card.addEventListener('click', ()=>{
+      const k = card.dataset.k;
+      if (introSel.has(k)){ introSel.delete(k); card.classList.remove('selected-yes'); }
+      else { introSel.add(k); card.classList.add('selected-yes'); }
+    });
+  });
+  document.getElementById('introCheck').onclick = ()=>{
+    const fb = document.getElementById('introFb');
+    fb.className = 'feedback show info';
+    if (introSel.size === 4){
+      fb.textContent = '答對！課本提到流水、風、海浪和生物活動都會改變地表。⭐';
+      award('intro', 1);
+    } else if (introSel.size === 0){
+      fb.textContent = '先選一選再檢查喔！';
+    } else {
+      fb.textContent = '其實四種都有可能喔！流水、風、海浪、生物活動都會改變地表（課本 P.71）。再選齊看看～';
+    }
+  };
+
+  /* A1 vote yes/no */
+  document.querySelectorAll('#a1Votes .vote-btns button').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const card = btn.closest('.vote-card');
+      card.dataset.pick = btn.dataset.v;
+      card.classList.remove('selected-yes','selected-no');
+      card.classList.add(btn.dataset.v==='yes' ? 'selected-yes' : 'selected-no');
+    });
+  });
+  document.getElementById('a1Check1').onclick = ()=>{
+    const cards = [...document.querySelectorAll('#a1Votes .vote-card')];
+    let ok = 0, miss = 0;
+    cards.forEach(c=>{
+      if (!c.dataset.pick){ miss++; return; }
+      if (c.dataset.pick === c.dataset.ans) ok++;
+    });
+    const fb = document.getElementById('a1Fb1');
+    fb.className = 'feedback show';
+    if (miss){ fb.classList.add('bad'); fb.textContent = '還有題目沒選喔！'; return; }
+    if (ok === cards.length){
+      fb.classList.add('ok');
+      fb.textContent = '全部正確！這四種景觀都和流水有關（土石流、掏空、壺穴、瀑布）。⭐⭐';
+      award('a1t1', 2);
+    } else {
+      fb.classList.add('bad');
+      fb.textContent = '對了 '+ok+' 題。提示：這四張都是流水造成的改變，再改改看！';
+    }
+  };
+
+  /* Generic drag-drop with touch pointer support */
+  function setupDnD(poolId, zonesId, checkId, resetId, fbId, awardKey, awardN){
+    const pool = document.getElementById(poolId);
+    const zones = document.getElementById(zonesId);
+    let dragEl = null;
+    let selected = null;
+
+    function place(chip, zone){
+      zone.appendChild(chip);
+      chip.classList.add('placed');
+      chip.classList.remove('wrong','right');
+    }
+    function returnPool(chip){
+      pool.appendChild(chip);
+      chip.classList.remove('placed','wrong','right');
+    }
+
+    pool.querySelectorAll('.chip').forEach(chip=>{
+      chip.addEventListener('pointerdown', (e)=>{
+        if (e.button !== undefined && e.button !== 0) return;
+        selected = chip;
+        dragEl = chip;
+        chip.classList.add('dragging');
+        chip.setPointerCapture(e.pointerId);
+      });
+      chip.addEventListener('pointerup', (e)=>{
+        chip.classList.remove('dragging');
+        // hit test zones
+        const x = e.clientX, y = e.clientY;
+        let hit = null;
+        zones.querySelectorAll('.zone').forEach(z=>{
+          const r = z.getBoundingClientRect();
+          if (x>=r.left && x<=r.right && y>=r.top && y<=r.bottom) hit = z;
+        });
+        if (hit && dragEl) place(dragEl, hit);
+        else if (selected && !hit){ /* keep selection for tap-zone */ }
+        dragEl = null;
+      });
+      chip.addEventListener('click', ()=>{
+        selected = chip;
+        pool.querySelectorAll('.chip').forEach(c=>c.style.outline='');
+        zones.querySelectorAll('.chip').forEach(c=>c.style.outline='');
+        chip.style.outline = '3px solid #e8913a';
+      });
+    });
+
+    zones.querySelectorAll('.zone').forEach(zone=>{
+      zone.addEventListener('click', ()=>{
+        if (selected){ place(selected, zone); selected.style.outline=''; selected=null; }
+      });
+      zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('over'); });
+      zone.addEventListener('dragleave', ()=> zone.classList.remove('over'));
+      zone.addEventListener('drop', e=>{
+        e.preventDefault(); zone.classList.remove('over');
+        const id = e.dataTransfer.getData('text/plain');
+        const chip = document.querySelector('.chip[data-cid="'+id+'"]') || dragEl;
+      });
+    });
+
+    // HTML5 drag fallback
+    pool.querySelectorAll('.chip').forEach((chip,i)=>{
+      chip.dataset.cid = poolId + '_' + i;
+      chip.addEventListener('dragstart', e=>{
+        dragEl = chip;
+        e.dataTransfer.setData('text/plain', chip.dataset.cid);
+        chip.classList.add('dragging');
+      });
+      chip.addEventListener('dragend', ()=> chip.classList.remove('dragging'));
+    });
+    zones.querySelectorAll('.zone').forEach(zone=>{
+      zone.addEventListener('drop', e=>{
+        e.preventDefault();
+        zone.classList.remove('over');
+        const cid = e.dataTransfer.getData('text/plain');
+        const chip = document.querySelector('.chip[data-cid="'+cid+'"]');
+        if (chip) place(chip, zone);
+      });
+    });
+
+    document.getElementById(checkId).onclick = ()=>{
+      let total=0, correct=0;
+      const chips = zones.querySelectorAll('.chip');
+      if (chips.length < pool.querySelectorAll('.chip').length + chips.length && pool.querySelectorAll('.chip').length>0){
+        // some left in pool
+      }
+      const allChips = [...zones.querySelectorAll('.chip')];
+      const left = pool.querySelectorAll('.chip').length;
+      const fb = document.getElementById(fbId);
+      fb.className = 'feedback show';
+      if (left > 0){ fb.classList.add('bad'); fb.textContent = '還有卡片沒放完！'; return; }
+      allChips.forEach(chip=>{
+        total++;
+        const zone = chip.parentElement;
+        const ok = zone.dataset.cat === chip.dataset.cat;
+        chip.classList.toggle('right', ok);
+        chip.classList.toggle('wrong', !ok);
+        if (ok) correct++;
+      });
+      if (correct === total){
+        fb.classList.add('ok');
+        fb.textContent = '全對！太棒了 ⭐⭐';
+        award(awardKey, awardN);
+        zones.querySelectorAll('.zone').forEach(z=>z.classList.add('correct'));
+      } else {
+        fb.classList.add('bad');
+        fb.textContent = '對了 '+correct+'／'+total+'。紅框再調整，綠框是對的！';
+      }
+    };
+
+    document.getElementById(resetId).onclick = ()=>{
+      zones.querySelectorAll('.chip').forEach(c=> returnPool(c));
+      zones.querySelectorAll('.zone').forEach(z=>z.classList.remove('correct'));
+      const fb = document.getElementById(fbId);
+      fb.className = 'feedback'; fb.textContent='';
+    };
+  }
+
+  setupDnD('a1Pool','a1Zones','a1Check2','a1Reset2','a1Fb2','a1t2',2);
+  setupDnD('a2Pool','a2Zones','a2Check1','a2Reset1','a2Fb1','a2t1',2);
+
+  /* Meander tap */
+  let mode = '凹岸';
+  const marks = { '凹岸': new Set(), '凸岸': new Set() };
+  document.querySelectorAll('#a2Mode button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      mode = b.dataset.mode;
+      document.querySelectorAll('#a2Mode button').forEach(x=>x.classList.remove('picked'));
+      b.classList.add('picked');
+    });
+  });
+  document.querySelectorAll('#meanderSvg .tap-hot').forEach(hot=>{
+    hot.addEventListener('click', ()=>{
+      const bank = hot.dataset.bank;
+      // clear from both
+      marks['凹岸'].delete(hot);
+      marks['凸岸'].delete(hot);
+      marks[mode].add(hot);
+      // visual: stroke
+      document.querySelectorAll('#meanderSvg .tap-hot').forEach(h=>{
+        const inA = marks['凹岸'].has(h);
+        const inB = marks['凸岸'].has(h);
+        if (inA){ h.setAttribute('stroke','#c0392b'); h.setAttribute('stroke-width','4'); }
+        else if (inB){ h.setAttribute('stroke','#2e9e5b'); h.setAttribute('stroke-width','4'); }
+        else { h.setAttribute('stroke','#fff'); h.setAttribute('stroke-width','2'); }
+      });
+      document.getElementById('a2TapStatus').textContent =
+        '已標：凹岸 '+marks['凹岸'].size+'／2　凸岸 '+marks['凸岸'].size+'／2';
+    });
+  });
+  document.getElementById('a2Check2').onclick = ()=>{
+    const fb = document.getElementById('a2Fb2');
+    fb.className = 'feedback show';
+    let ok = true;
+    marks['凹岸'].forEach(h=>{ if (h.dataset.bank !== '凹岸') ok=false; });
+    marks['凸岸'].forEach(h=>{ if (h.dataset.bank !== '凸岸') ok=false; });
+    if (marks['凹岸'].size!==2 || marks['凸岸'].size!==2){
+      fb.classList.add('bad'); fb.textContent='請把凹岸、凸岸各標 2 個點（A–D 都要標到）。'; return;
+    }
+    if (ok){
+      fb.classList.add('ok');
+      fb.textContent='正確！A、C 是凹岸（外側、侵蝕）；B、D 是凸岸（內側、堆積）。⭐⭐';
+      award('a2t2', 2);
+    } else {
+      fb.classList.add('bad');
+      fb.textContent='再想想：彎道「外側」水流急＝凹岸；「內側」水流緩＝凸岸。';
+    }
+  };
+  document.getElementById('a2Reset2').onclick = ()=>{
+    marks['凹岸'].clear(); marks['凸岸'].clear();
+    document.querySelectorAll('#meanderSvg .tap-hot').forEach(h=>{
+      h.setAttribute('stroke','#fff'); h.setAttribute('stroke-width','2');
+    });
+    document.getElementById('a2TapStatus').textContent='已標：凹岸 0／2　凸岸 0／2';
+    document.getElementById('a2Fb2').className='feedback';
+  };
+
+  /* Match helpers */
+  function setupMatch(containerId, fbId, awardKey, awardN, needAll){
+    const root = document.getElementById(containerId);
+    let answered = 0;
+    const items = root.querySelectorAll('.match-item');
+    const total = items.length;
+    items.forEach(item=>{
+      item.querySelectorAll('button[data-v]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          if (item.dataset.done) return;
+          const ok = btn.dataset.v === item.dataset.ans;
+          btn.classList.add(ok ? 'right' : 'wrong');
+          if (ok){
+            item.dataset.done = '1';
+            answered++;
+            item.querySelectorAll('button').forEach(b=> b.disabled = true);
+            if (answered === total){
+              const fb = document.getElementById(fbId);
+              if (fb){ fb.className='feedback show ok'; fb.textContent='全部配對完成！⭐⭐'; }
+              award(awardKey, awardN);
+            }
+          }
+        });
+      });
+    });
+  }
+  setupMatch('a2Coast','a2Fb3','a2coast',2);
+  setupMatch('a3Rocks','a3Fb1','a3t1',2);
+
+  /* Mineral quiz */
+  const MQ = [
+    {q:'摸起來滑滑的、莫氏硬度最小（1）的是？', opts:['滑石','石英','金剛石','硫磺'], ans:0, ico:['⬜','💎','💠','🟡']},
+    {q:'常做鉛筆筆心、顏色較黑、硬度小的是？', opts:['石英','石墨','長石','方解石'], ans:1, ico:['💎','⬛','🟤','⬜']},
+    {q:'硬度大約 7、可做成飾品（水晶）的是？', opts:['滑石','石膏','石英','硫磺'], ans:2, ico:['⬜','⬜','💎','🟡']},
+    {q:'石灰岩主要是由哪一種礦物組成？', opts:['石英','方解石','黑雲母','硫磺'], ans:1, ico:['💎','⬜','⬛','🟡']},
+    {q:'容易燃燒、可做火藥原料的是？', opts:['硫磺','板岩','大理岩','滑石'], ans:0, ico:['🟡','🪨','⬜','⬜']}
+  ];
+  let mqI = 0, mqScore = 0;
+  function renderMQ(){
+    const item = MQ[mqI];
+    document.getElementById('mqQ').textContent = '（'+(mqI+1)+'／'+MQ.length+'）'+item.q;
+    const box = document.getElementById('mqOpts');
+    box.innerHTML = '';
+    const fb = document.getElementById('a3Fb2');
+    fb.className='feedback';
+    item.opts.forEach((name,i)=>{
+      const d = document.createElement('div');
+      d.className = 'mineral-card';
+      d.innerHTML = '<div class="ico">'+(item.ico[i]||'🪨')+'</div><div class="name">'+name+'</div>';
+      d.addEventListener('click', ()=>{
+        if (d.dataset.locked) return;
+        box.querySelectorAll('.mineral-card').forEach(c=> c.dataset.locked='1');
+        if (i === item.ans){
+          d.style.borderColor = '#2e9e5b'; d.style.background='#e8f8ee';
+          fb.className='feedback show ok'; fb.textContent='答對！';
+          mqScore++;
+        } else {
+          d.style.borderColor = '#c0392b'; d.style.background='#fdecea';
+          fb.className='feedback show bad';
+          fb.textContent='再想想～答案是「'+item.opts[item.ans]+'」。';
+        }
+      });
+      box.appendChild(d);
+    });
+  }
+  document.getElementById('mqNext').onclick = ()=>{
+    if (mqI < MQ.length-1){ mqI++; renderMQ(); }
+    else {
+      const fb = document.getElementById('a3Fb2');
+      fb.className='feedback show ok';
+      fb.textContent='礦物偵探結束！本輪答對 '+mqScore+'／'+MQ.length+'。'+(mqScore>=3?' ⭐⭐':'');
+      if (mqScore>=3) award('a3t2', 2);
+    }
+  };
+  renderMQ();
+
+  document.getElementById('resetAll').onclick = ()=>{
+    if (!confirm('確定清除星星與作答紀錄？')) return;
+    localStorage.removeItem('earth_stars');
+    localStorage.removeItem('earth_awarded');
+    location.reload();
+  };
+
+  // Persist think text
+  ['a1Think','a2Think','a3Think'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.value = localStorage.getItem('earth_'+id) || '';
+    el.addEventListener('change', ()=> localStorage.setItem('earth_'+id, el.value));
+  });
+
+  show(0);
+})();
+</script>
+</body>
+</html>
