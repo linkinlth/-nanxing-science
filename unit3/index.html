@@ -149,6 +149,20 @@ button:active{transform:scale(.97)}
 @keyframes pop{0%{transform:scale(.8)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
 .hidden{display:none!important}
 .camp-scene{width:100%;max-width:640px;margin:0 auto;display:block}
+
+/* 課後檢核連結（與既有按鈕風格一致） */
+a.btn-primary,a.btn-ok,a.btn-ghost,a.btn-warn{
+  display:inline-flex;align-items:center;justify-content:center;
+  text-decoration:none;font:inherit;font-weight:700;
+  min-height:var(--tap);padding:12px 20px;border-radius:12px;
+}
+a.btn-primary{background:var(--deep);color:#fff}
+a.btn-ok{background:var(--ok);color:#fff}
+a.btn-ghost{background:#edf4fa;color:var(--deep)}
+a.btn-warn{background:var(--orange);color:#fff}
+.quiz-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:600px){.quiz-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -217,6 +231,18 @@ button:active{transform:scale(.97)}
     <h2>今天三站啟動</h2>
     <p>① 流水的作用　② 水岸地貌　③ 地表組成<br>每站先猜、再玩、最後「想一想」——準備好出發！</p>
     <button type="button" class="btn-ok" data-go="1" style="width:100%;margin-top:8px">開始活動 1 ▶</button>
+  </div>
+
+  <div class="task" id="unit3Quizzes">
+    <h3><span class="task-num">✓</span> 課後線上檢核</h3>
+    <p>上完對應小單元後，再來檢查看看會不會。先填座號和姓名，作答後可以列印訂正單給家長簽名。</p>
+    <div class="quiz-grid">
+      <a class="btn-primary" href="quiz/1-1.html">1-1 流水改變大地樣貌</a>
+      <a class="btn-primary" href="quiz/1-2.html">1-2 流水對地表的影響</a>
+      <a class="btn-primary" href="quiz/2-1.html">2-1 河流的地形</a>
+      <a class="btn-primary" href="quiz/2-2.html">2-2 海岸的地形</a>
+    </div>
+    <p class="hint">老師若改用 Google 表單版本，會另外在 Classroom 公告。</p>
   </div>
 </section>
 
@@ -525,7 +551,14 @@ button:active{transform:scale(.97)}
   <div class="hero" id="finale">
     <h2>🎉 啟動完成</h2>
     <p>你完成了三站啟動！星星：<strong id="finalStars">0</strong></p>
-    <p class="hint">大地一直在變——流水、海浪、風化和生物都在「雕刻」地表。接下來跟著課本活動，動手實驗、仔細觀察！</p>
+    <p class="hint">大地一直在變——流水、海浪、風化和生物都在「雕刻」地表。接下來跟著課本活動，動手實驗、仔細觀察！上完小單元後，也可以做下面的課後檢核。</p>
+    <div class="quiz-grid">
+      <a class="btn-primary" href="quiz/1-1.html">1-1 流水改變大地樣貌</a>
+      <a class="btn-primary" href="quiz/1-2.html">1-2 流水對地表的影響</a>
+      <a class="btn-primary" href="quiz/2-1.html">2-1 河流的地形</a>
+      <a class="btn-primary" href="quiz/2-2.html">2-2 海岸的地形</a>
+    </div>
+    <p class="hint">老師若改用 Google 表單版本，會另外在 Classroom 公告。</p>
     <div class="btn-row">
       <button type="button" class="btn-warn" id="resetAll">清除紀錄重玩</button>
       <button type="button" class="btn-ghost" data-go="0">回開場</button>
