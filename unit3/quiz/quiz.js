@@ -49,21 +49,58 @@
 
   document.title = quiz.activity + " · 課後檢核";
 
+  function qPoints(q) {
+    if (q.type === "short") return Number(q.points != null ? q.points : quiz.shortPoints);
+    return Number(q.points != null ? q.points : quiz.choicePoints);
+  }
+
+  function figureHtml(q) {
+    if (!q.image) return "";
+    return (
+      '<figure class="q-fig">' +
+        '<img src="' + esc(q.image) + '" alt="' + esc(q.imageAlt || "") + '">' +
+      "</figure>"
+    );
+  }
+
+  function groupIntroHtml(q, index) {
+    if (!q.groupIntro) return "";
+    var prev = quiz.questions[index - 1];
+    if (prev && prev.groupIntro === q.groupIntro) return "";
+    return '<div class="card q-group-card"><p class="q-group">' + esc(q.groupIntro) + "</p></div>";
+  }
+
+  function pointsBlurb() {
+    var distinct = [];
+    choiceQs.forEach(function (q) {
+      var n = qPoints(q);
+      if (distinct.indexOf(n) === -1) distinct.push(n);
+    });
+    if (distinct.length === 1) {
+      return "選擇題每題 " + distinct[0] + " 分（共 " + choiceMax + " 分），簡答題 " + shortMax +
+        " 分由老師批改，滿分 " + (choiceMax + shortMax) + " 分。";
+    }
+    return "選擇題共 " + choiceMax + " 分（各題配分見題目），簡答題 " + shortMax +
+      " 分由老師批改，滿分 " + (choiceMax + shortMax) + " 分。";
+  }
+
   var choiceQs = quiz.questions.filter(function (q) { return q.type === "choice"; });
   var shortQs = quiz.questions.filter(function (q) { return q.type === "short"; });
-  var choiceMax = choiceQs.length * quiz.choicePoints;
-  var shortMax = shortQs.length * quiz.shortPoints;
+  var choiceMax = choiceQs.reduce(function (s, q) { return s + qPoints(q); }, 0);
+  var shortMax = shortQs.reduce(function (s, q) { return s + qPoints(q); }, 0);
 
   function renderForm() {
-    var qHtml = quiz.questions.map(function (q) {
+    var qHtml = quiz.questions.map(function (q, index) {
       if (q.type === "short") {
         return (
+          groupIntroHtml(q, index) +
           '<section class="card q-card" id="qbox-' + q.no + '">' +
             '<div class="q-head">' +
               '<span class="q-no">' + q.no + "</span>" +
-              '<span class="q-type">' + esc(q.typeLabel) + "（" + quiz.shortPoints + " 分，老師批改）</span>" +
+              '<span class="q-type">' + esc(q.typeLabel) + "（" + qPoints(q) + " 分，老師批改）</span>" +
               '<span class="q-focus">' + esc(q.focus) + "</span>" +
             "</div>" +
+            figureHtml(q) +
             '<div class="stem">' + esc(q.stem) + "</div>" +
             '<label class="field" for="ans-' + q.no + '">我的回答' +
               '<textarea id="ans-' + q.no + '" name="q' + q.no + '" rows="5" required placeholder="請寫下你的想法……"></textarea>' +
@@ -83,12 +120,14 @@
         );
       }).join("");
       return (
+        groupIntroHtml(q, index) +
         '<section class="card q-card" id="qbox-' + q.no + '">' +
           '<div class="q-head">' +
             '<span class="q-no">' + q.no + "</span>" +
-            '<span class="q-type">' + esc(q.typeLabel) + "（" + quiz.choicePoints + " 分）</span>" +
+            '<span class="q-type">' + esc(q.typeLabel) + "（" + qPoints(q) + " 分）</span>" +
             '<span class="q-focus">' + esc(q.focus) + "</span>" +
           "</div>" +
+          figureHtml(q) +
           '<div class="stem">' + esc(q.stem) + "</div>" +
           '<div class="options" role="radiogroup" aria-label="第' + q.no + '題選項">' + opts + "</div>" +
           '<div class="feedback" id="fb-' + q.no + '"></div>' +
@@ -100,9 +139,7 @@
       '<div class="hero">' +
         '<span class="badge">' + esc(quiz.unit) + " · 南一 · 六年級</span>" +
         "<h1>" + esc(quiz.activity) + "</h1>" +
-        "<p>上完課後來檢查看看會不會。先填座號和姓名，再作答。選擇題每題 " +
-        quiz.choicePoints + " 分（共 " + choiceMax + " 分），簡答題 " + shortMax +
-        " 分由老師批改，滿分 100 分。</p>" +
+        "<p>上完課後來檢查看看會不會。先填座號和姓名，再作答。" + pointsBlurb() + "</p>" +
         '<p class="hint">課本頁碼：' + esc(quiz.pages) + "</p>" +
       "</div>" +
       '<form id="quizForm" autocomplete="off" novalidate>' +
@@ -186,20 +223,19 @@
   }
 
   function grade(info, answers) {
-    var correctCount = 0;
+    var choiceScore = 0;
     var wrong = [];
     quiz.questions.forEach(function (q) {
       var ans = answers[q.no];
       if (q.type === "choice") {
         var ok = ans === q.answer;
-        if (ok) correctCount += 1;
+        if (ok) choiceScore += qPoints(q);
         else wrong.push(q.no);
         markChoice(q, ans, ok);
       } else {
         markShort(q, ans);
       }
     });
-    var choiceScore = correctCount * quiz.choicePoints;
     lockForm();
     renderResult(info, answers, choiceScore, wrong);
     buildPrintSheet(info, answers, choiceScore, wrong);
@@ -235,7 +271,7 @@
     var fb = $("fb-" + q.no);
     fb.className = "feedback show info";
     fb.innerHTML =
-      "簡答題請對照評分標準自己檢查，老師之後會批改（" + quiz.shortPoints + " 分）。" +
+      "簡答題請對照評分標準自己檢查，老師之後會批改（" + qPoints(q) + " 分）。" +
       "<br><strong>你的作答：</strong>" + nl(ans) +
       "<br><strong>評分標準：</strong><br>" + nl(q.rubric) +
       "<br><strong>觀念說明：</strong>" + esc(q.explain);
@@ -278,7 +314,8 @@
         var q = quiz.questions.filter(function (x) { return x.no === no; })[0];
         items +=
           '<div class="item">' +
-            "<p><strong>第 " + q.no + " 題（" + esc(q.typeLabel) + "）</strong></p>" +
+            "<p><strong>第 " + q.no + " 題（" + esc(q.typeLabel) + "，" + qPoints(q) + " 分）</strong></p>" +
+            figureHtml(q) +
             "<p>" + esc(q.stem) + "</p>" +
             "<p>你的作答：" + esc(optionText(q, answers[q.no]) || "（未作答）") + "</p>" +
             "<p>正確答案：" + esc(optionText(q, q.answer)) + "</p>" +
@@ -294,7 +331,8 @@
     var shortHtml = shortQs.map(function (q) {
       return (
         '<div class="item">' +
-          "<p><strong>第 " + q.no + " 題（簡答題，待老師批改）</strong></p>" +
+          "<p><strong>第 " + q.no + " 題（簡答題，待老師批改，" + qPoints(q) + " 分）</strong></p>" +
+          figureHtml(q) +
           "<p>" + esc(q.stem) + "</p>" +
           "<p>你的作答：" + nl(answers[q.no]) + "</p>" +
           "<p>評分標準：<br>" + nl(q.rubric) + "</p>" +

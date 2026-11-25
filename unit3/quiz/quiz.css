@@ -110,6 +110,19 @@ input:focus,textarea:focus{outline:3px solid #8ec4e8;border-color:var(--deep)}
 }
 .quiz-list a.card-link:active{transform:scale(.985)}
 .quiz-list a.card-link span{display:block;font-size:15px;color:var(--muted);font-weight:600;margin-top:4px}
+
+.q-group-card{padding:14px 18px}
+.q-group{
+  margin:0;font-size:18px;font-weight:700;color:var(--deep);
+  background:#eef7fc;border-left:5px solid var(--water);
+  padding:10px 12px;border-radius:10px;
+}
+.q-fig{margin:4px 0 14px;text-align:center}
+.q-fig img{
+  max-width:100%;height:auto;background:#fff;
+  border:2px solid #d5e4ef;border-radius:12px;
+  display:block;margin:0 auto;
+}
 #printSheet{display:none}
 .locked .opt{cursor:default}
 @media print{
@@ -131,4 +144,6 @@ input:focus,textarea:focus{outline:3px solid #8ec4e8;border-color:var(--deep)}
   #printSheet .sign{margin-top:10pt;display:flex;gap:24pt}
   #printSheet .sign .line{flex:1;border-bottom:0.75pt solid #333;height:28pt}
   #printSheet ul{margin:0;padding-left:18pt}
+  #printSheet img{max-width:72%;max-height:70mm;display:block;margin:4pt auto;border:0.75pt solid #333}
+  #printSheet .q-fig{margin:4pt 0 6pt}
 }
