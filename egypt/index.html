@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#DB6A41">
+<meta name="description" content="古埃及探險島：跟著小法喵，點一點小島，認識古埃及！">
+<title>古埃及探險島</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main id="app">
+  <!-- 首頁：地圖 -->
+  <section id="home" class="view active" aria-label="探險地圖">
+    <header class="top">
+      <h1><span class="sun">☀️</span>古埃及探險島</h1>
+      <p class="sub">點一個島，或拖一拖轉轉看！</p>
+      <button class="parent-btn" data-go="parents" aria-label="給爸媽看">爸媽</button>
+    </header>
+    <div class="sea" id="sea">
+      <div class="world" id="world">
+        <div class="water wall"></div>
+        <div class="water"></div>
+        <div id="isles3d"></div>
+      </div>
+      <div class="overlay" id="overlay" aria-hidden="false"></div>
+    </div>
+    <div class="mascot-wrap">
+      <button class="mascot-btn" id="mascot" aria-label="小法喵說話"></button>
+      <div class="bubble" id="bubble">嗨！我是小法喵。<br>點一個島吧！</div>
+    </div>
+    <nav class="dock" aria-label="功能">
+      <button class="dock-btn" data-go="game"><span class="ico">🔎</span><span>找符號</span><b id="stampCount" class="chip">0/7</b></button>
+      <button class="dock-btn" data-go="dex"><span class="ico">📚</span><span>小圖鑑</span><b id="dexCount" class="chip">0/28</b></button>
+      <button class="dock-btn" data-go="diary"><span class="ico">📔</span><span>日記</span><b id="favCount" class="chip">❤ 0</b></button>
+    </nav>
+  </section>
+
+  <!-- 小島：展品卡片 -->
+  <section id="card" class="view" aria-label="展品">
+    <div class="card-top">
+      <button class="round" id="cardHome" aria-label="回到地圖">🗺️</button>
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <span class="island-tag" id="islandTag"></span>
+    </div>
+    <div class="photo-box"><img id="cardImg" alt=""></div>
+    <div class="card-body">
+      <h2 id="cardTitle"></h2>
+      <p id="cardText"></p>
+      <button class="dexlink" id="dexLink" hidden>📚 看卡通圖鑑</button>
+    </div>
+    <div class="card-actions">
+      <button class="big" id="prev" aria-label="上一個">◀</button>
+      <button class="big say" id="say" aria-label="唸給我聽">🔊 <span>聽一聽</span></button>
+      <button class="big fav" id="fav" aria-label="我最愛">🤍</button>
+      <button class="big" id="next" aria-label="下一個">▶</button>
+    </div>
+  </section>
+
+  <!-- 找符號遊戲 -->
+  <section id="game" class="view" aria-label="找符號">
+    <div class="card-top">
+      <button class="round" data-go="home" aria-label="回到地圖">🗺️</button>
+      <h2 class="view-title">🔎 找符號</h2>
+      <span></span>
+    </div>
+    <div class="passport" id="passport" aria-label="探險護照"></div>
+    <div class="game-box" id="gameBox"></div>
+  </section>
+
+  <!-- 探險日記 -->
+  <section id="diary" class="view" aria-label="探險日記">
+    <div class="card-top">
+      <button class="round" data-go="home" aria-label="回到地圖">🗺️</button>
+      <h2 class="view-title">📔 探險日記</h2>
+      <button class="round" id="favFilter" aria-label="只看最愛">🤍</button>
+    </div>
+    <div class="wall" id="wall"></div>
+  </section>
+
+  <!-- 博物館小圖鑑 -->
+  <section id="dex" class="view" aria-label="博物館小圖鑑">
+    <div class="card-top">
+      <button class="round" data-go="home" aria-label="回到地圖">🗺️</button>
+      <h2 class="view-title">📚 博物館小圖鑑</h2>
+      <span class="dex-prog" id="dexProg"></span>
+    </div>
+    <div class="dexgrid" id="dexGrid"></div>
+  </section>
+
+  <section id="dexcard" class="view" aria-label="圖鑑卡片">
+    <div class="card-top">
+      <button class="round" id="dexBack" aria-label="回到圖鑑">📚</button>
+      <span class="num-chip" id="dexNum"></span>
+      <button class="round" id="dexHome" aria-label="回到地圖">🗺️</button>
+    </div>
+    <div class="dex-art"><img id="dexImg" alt=""></div>
+    <div class="dex-body">
+      <h2 id="dexName"></h2>
+      <div id="dexText"></div>
+    </div>
+    <div class="card-actions">
+      <button class="big" id="dexPrev" aria-label="上一個">◀</button>
+      <button class="big say" id="dexSay" aria-label="唸給我聽">🔊 <span>聽故事</span></button>
+      <button class="big photo" id="dexPhoto" hidden aria-label="看真的照片">📷</button>
+      <button class="big" id="dexNext" aria-label="下一個">▶</button>
+    </div>
+  </section>
+
+  <!-- 給爸媽 -->
+  <section id="parents" class="view" aria-label="給爸媽">
+    <div class="card-top">
+      <button class="round" data-go="home" aria-label="回到地圖">🗺️</button>
+      <h2 class="view-title">給爸媽</h2>
+      <span></span>
+    </div>
+    <div class="parents-body">
+      <p>這是一個給小朋友複習參觀的小網站：用自己拍的照片，加上很短的句子，點一點、聽一聽、玩一玩。</p>
+      <ul>
+        <li>🔊 「聽一聽」使用瀏覽器內建的中文語音，需要打開裝置音量；有些裝置沒有中文語音就不會出聲。</li>
+        <li>⭐ 進度（蓋章、最愛）只存在這台裝置的瀏覽器裡，不會上傳。</li>
+        <li>📝 小法喵的句子是用簡單的話改寫的，只是和孩子聊天用，細節請以展場與官方資料為準。</li>
+      </ul>
+      <h3>想看更多？</h3>
+      <p>展覽「法老之王」（奇美博物館，大英博物館典藏）有官方語音導覽與完整說明：</p>
+      <p><a class="link-btn" href="https://www.muguide.world/zh-TW/KINGOFEGYPT" target="_blank" rel="noopener">前往官方 MuGuide 語音導覽 ↗</a></p>
+      <p class="credit">展覽與展品資訊：奇美博物館《埃及法老之王》特展／大英博物館典藏。本網站為家庭個人使用的非官方小作品，照片為家人現場所拍，文字為自行改寫。</p>
+      <p><button class="reset" id="reset">🧹 重新開始（清除蓋章與最愛）</button></p>
+    </div>
+  </section>
+
+  <!-- 開場 -->
+  <div id="welcome" class="welcome">
+    <div class="welcome-box">
+      <div class="mascot-big" id="mascotBig"></div>
+      <h2>古埃及探險島</h2>
+      <p>我是小法喵，<br>一起去探險吧！</p>
+      <button class="go" id="goBtn">出發！🚀</button>
+    </div>
+  </div>
+  <div id="confetti" aria-hidden="true"></div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
